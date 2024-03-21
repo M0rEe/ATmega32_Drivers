@@ -2,9 +2,11 @@
 
 void PWM_voidInitChannel0(void)
 {
-    // Select Fast PWM
+// Select PWM Mode
+#if (PWM_TIMER0_MODE == TIMER0_FAST_PWM_MODE)
     Set_Bit(TCCR0, WGM00);
     Set_Bit(TCCR0, WGM01);
+
     // Select non/inverting
 #if TIMER0_FAST_PWM_STATE == TIMER0_FAST_PWM_INVERTING
     Set_Bit(TCCR0, COM00);
@@ -16,9 +18,32 @@ void PWM_voidInitChannel0(void)
     Clr_Bit(TCCR0, COM00);
     Clr_Bit(TCCR0, COM01);
 #endif
+
+#elif (PWM_TIMER0_MODE == TIMER0_PWM_PHASE_CORRET_MODE)
+    Set_Bit(TCCR0, WGM00);
+    Clr_Bit(TCCR0, WGM01);
+
+    // Select non/inverting
+#if TIMER0_PHASE_CORRECT_PWM_STATE == TIMER0_PHASE_CORRECT_PWM_INVERTING
+    Clr_Bit(TCCR0, COM00);
+    Set_Bit(TCCR0, COM01);
+#elif TIMER0_PHASE_CORRECT_PWM_STATE == TIMER0_PHASE_CORRECT_PWM_NON_INVERTING
+    Set_Bit(TCCR0, COM00);
+    Set_Bit(TCCR0, COM01);
+#else
+    Clr_Bit(TCCR0, COM00);
+    Clr_Bit(TCCR0, COM01);
+#endif
+
+#endif
+
 // Duty cycle ratio
-#if (PWM_MODE == TIMER0_FAST_PWM_MODE)
+#if (PWM_TIMER0_MODE == TIMER0_FAST_PWM_MODE)
     OCR0 = TIMER0_FAST_PWM_OCR_VALUE;
+
+#elif (PWM_TIMER0_MODE == TIMER0_PWM_PHASE_CORRET_MODE)
+    OCR0 = TIMER0_PHASE_CORRECT_PWM_OCR_VALUE;
+
 #endif
 }
 
@@ -26,7 +51,29 @@ void PWM_voidGenerateOnChannel0(u8 copy_u8DutyCycle, u8 copy_u8PrescalerVal)
 {
     if (copy_u8DutyCycle <= 100)
     {
+
+// Duty cycle ratio
+#if (PWM_TIMER0_MODE == TIMER0_FAST_PWM_MODE)
+#if TIMER0_FAST_PWM_STATE == TIMER0_FAST_PWM_INVERTING
+        // TODO
+        OCR0 = (256 - ((copy_u8DutyCycle * 256) / 100) - 1);
+
+#elif TIMER0_FAST_PWM_STATE == TIMER0_FAST_PWM_NON_INVERTING
         OCR0 = (((u16)copy_u8DutyCycle * 256) / 100) - 1;
+
+#endif // INV/NON
+
+#elif (PWM_TIMER0_MODE == TIMER0_PWM_PHASE_CORRET_MODE)
+#if TIMER0_PHASE_CORRECT_PWM_STATE == TIMER0_PHASE_CORRECT_PWM_INVERTING
+        // TODO
+        OCR0 = (510 - ((510 * copy_u8DutyCycle) / 100) - 1) / 2;
+#elif TIMER0_PHASE_CORRECT_PWM_STATE == TIMER0_PHASE_CORRECT_PWM_NON_INVERTING
+        OCR0 = ((u16)(510 * copy_u8DutyCycle) / 200) - 1;
+
+#endif // INV/NON
+
+#endif // MODE IF
+
         PWM_voidStartTimer0(copy_u8PrescalerVal);
     }
     else
@@ -93,6 +140,8 @@ void PWM_voidStartTimer0(u8 copy_u8PrescalerVal)
     }
 }
 
+//------------------------------------------------
+
 void PWM_voidInitChannel1A(void)
 {
     // Select fast pwm Mode
@@ -127,10 +176,10 @@ void PWM_voidGenerateOnChannel1A(u16 copy_u16PWMFreqHZ, f32 copy_f32DutyCycle, u
 {
     // Frequency calculations
     ICR1 = (u16)((1000000UL / copy_u16PWMFreqHZ) / 4) - 1;
-    
+
     // Duty cycle ratio
     OCR1A = (u16)((u32)(copy_f32DutyCycle * (ICR1 + 1)) / 100) - 1;
-    
+
     // Select Prescaler
     PWM_voidStartTimer1A(copy_u8PrescalerVal);
 }

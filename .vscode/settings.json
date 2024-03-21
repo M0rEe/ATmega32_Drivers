@@ -5,7 +5,9 @@
         "ecu_lcd.h": "c",
         "keypad_interface.h": "c",
         "keypad_config.h": "c",
-        "int_interface.h": "c"
+        "int_interface.h": "c",
+        "global_int.h": "c",
+        "timer1_config.h": "c"
     },
     "cmake.configureOnOpen": false,
     "editor.fontSize": 16

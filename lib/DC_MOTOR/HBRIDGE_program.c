@@ -34,6 +34,7 @@ void HB_voidInit(u8 copy_MotorNumber)
 void HB_voidMotorStart(u8 copy_u8Direction, u8 copy_MotorNumber)
 {
 #if (HBRIDGE_MODE == ETA32_HBRIDGE)
+    DIO_voidSetPinValue(HB_EN_PORT, HB_EN_PIN, DIO_PIN_HIGH);
 
     if (copy_u8Direction == HB_CLOCKWISE)
     {
@@ -54,6 +55,7 @@ void HB_voidMotorStart(u8 copy_u8Direction, u8 copy_MotorNumber)
     switch (copy_MotorNumber)
     {
     case MOTOR1_INDEX:
+        DIO_voidSetPinValue(HB_EN1_PORT, HB_EN1_PIN, DIO_PIN_HIGH);
         if (copy_u8Direction == HB_CLOCKWISE)
         {
             DIO_voidSetPinValue(HB_DIR1_PORT, HB_DIR1_PIN, DIO_PIN_HIGH);
@@ -71,11 +73,16 @@ void HB_voidMotorStart(u8 copy_u8Direction, u8 copy_MotorNumber)
         break;
 
     case MOTOR2_INDEX:
+        DIO_voidSetPinValue(HB_EN2_PORT, HB_EN2_PIN, DIO_PIN_HIGH);
         if (copy_u8Direction == HB_CLOCKWISE)
         {
+            DIO_voidSetPinValue(HB_DIR3_PORT, HB_DIR3_PIN, DIO_PIN_HIGH);
+            DIO_voidSetPinValue(HB_DIR4_PORT, HB_DIR4_PIN, DIO_PIN_LOW);
         }
         else if (copy_u8Direction == HB_COUNTER_CLOCKWISE)
         {
+            DIO_voidSetPinValue(HB_DIR3_PORT, HB_DIR4_PIN, DIO_PIN_LOW);
+            DIO_voidSetPinValue(HB_DIR4_PORT, HB_DIR3_PIN, DIO_PIN_HIGH);
         }
         else
         {

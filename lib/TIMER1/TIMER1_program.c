@@ -13,19 +13,19 @@ void TIMER1_voidInit(u8 copy_u8PrescalerValue)
     Clr_Bit(TCCR1A, WGM11);
     Clr_Bit(TCCR1A, WGM12);
     Clr_Bit(TCCR1A, WGM13);
+    // Enable interrupt
+    TIMER1_OVER_FLOW_INTERRUPT_ENABLE();
 
 #elif (TIMER1_MODE == TIMER1_CTC_MODE)
 
     Clr_Bit(TCCR1A, WGM10);
     Clr_Bit(TCCR1A, WGM11);
     Set_Bit(TCCR1A, WGM12);
-    Clr_Bit(TCCR1A, WGM13);
-
-#elif (TIMER1_MODE == TIMER1_FAST_PWM_MODE)
-#elif (TIMER1_MODE == TIMER1_PWM_PHASE_CORRET_MODE)
+    Clr_Bit(TCCR1A, WGM13);44
+    // Enable interrupt
+    TIMER1_OUTPUT_COMPARE_MATCH_A_INTERRUPT_ENABLE();
 
 #endif
-    // Enable interrupt
 
     // Select clock and start timer
     TIMER1_voidStartTimer(copy_u8PrescalerValue);
