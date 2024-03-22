@@ -11,8 +11,8 @@ void TIMER1_voidInit(u8 copy_u8PrescalerValue)
 
     Clr_Bit(TCCR1A, WGM10);
     Clr_Bit(TCCR1A, WGM11);
-    Clr_Bit(TCCR1A, WGM12);
-    Clr_Bit(TCCR1A, WGM13);
+    Clr_Bit(TCCR1B, WGM12);
+    Clr_Bit(TCCR1B, WGM13);
     // Enable interrupt
     TIMER1_OVER_FLOW_INTERRUPT_ENABLE();
 
@@ -20,8 +20,8 @@ void TIMER1_voidInit(u8 copy_u8PrescalerValue)
 
     Clr_Bit(TCCR1A, WGM10);
     Clr_Bit(TCCR1A, WGM11);
-    Set_Bit(TCCR1A, WGM12);
-    Clr_Bit(TCCR1A, WGM13);44
+    Set_Bit(TCCR1B, WGM12);
+    Clr_Bit(TCCR1B, WGM13);
     // Enable interrupt
     TIMER1_OUTPUT_COMPARE_MATCH_A_INTERRUPT_ENABLE();
 

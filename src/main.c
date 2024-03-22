@@ -45,7 +45,7 @@ void func(void)
 }
 u8 duty = 0;
 u8 freq = 0;
-
+extern volatile u8 State;
 int main(void)
 {
   /* Initialization seciton */
@@ -55,14 +55,14 @@ int main(void)
   PWM_voidInitChannel0();
   PWM_voidGenerateOnChannel0(80, PWM_FREQ_DIV_BY_64);
   _delay_ms(2);
+  ICU_voidInit();
 
   while (1)
   {
-    ICU_voidInit();
     ICU_voidGetDuty(&duty);
     ICU_voidGetFreqHz(&freq);
-    LCD_4_bit_voidWriteStringAt((u8 *)"duty :", 0, 0);
-    LCD_4_bit_voidWriteInt(duty);
+    LCD_4_bit_voidWriteStringAt((u8 *)"state :", 0, 0);
+    LCD_4_bit_voidWriteInt(TCNT1);
     LCD_4_bit_voidWriteStringAt((u8 *)"freq :", 1, 0);
     LCD_4_bit_voidWriteInt(freq);
     _delay_ms(100);
