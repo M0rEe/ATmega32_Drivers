@@ -13,6 +13,7 @@ void UART_voidSendStringBLOCKING(u8 *copy_u8PtrSentString);
 void UART_voidReceiveByteNON_BLOCKING(u8 *copy_u8PtrRecevieByte);
 void UART_voidReceiveByteBLOCKING(u8 *copy_u8PtrRecevieByte);
 void UART_voidReceiveStringBLOCKING(u8 *copy_u8PtrRecevieString);
-void UART_voidReceiveStringNON_BLOCKING(u8 *copy_u8PtrRecevieString);
+void UART_voidReceiveStringNON_BLOCKING(u8 copy_u8PtrRecevieString[]);
 
+void UART_voidStrIsReceived(u8 *copy_u8PtrBool);
 #endif // __UART_INTERFACE_H__

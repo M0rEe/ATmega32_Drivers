@@ -3,12 +3,15 @@
 #include "avr/io.h"
 #include "avr/interrupt.h"
 #include "GLOBAL_INT.h"
+#include "LCD_interface.h"
 
 static u8 PRV_TXArr[UART_MAX_BUFFER_SIZE];
 static u8 PRV_TXIdx = 0;
 
 static u8 PRV_RXArr[UART_MAX_BUFFER_SIZE];
 static u8 PRV_RXIdx = 0;
+
+static u8 PRV_RXStrComplete = 0;
 
 void UART_voidInit(u32 copy_u32BaudRate)
 {
@@ -64,7 +67,7 @@ void UART_voidInit(u32 copy_u32BaudRate)
 
     // TODO ENABLE GLOBAL INTERRUPT and PERIHERAL INTERRUPT
     SET_GLOBAL_INTERRUPT();
-    // Set_Bit(UCSRB, RXCIE);
+    Set_Bit(UCSRB, RXCIE);
     Set_Bit(UCSRB, TXCIE);
 }
 
@@ -86,7 +89,6 @@ void UART_voidSendStringBLOCKING(u8 *copy_u8PtrSentString)
 
 void UART_voidSendStringNON_BLOCKING(u8 *copy_u8PtrString)
 {
-
     while (copy_u8PtrString[PRV_TXIdx] != '\0')
     {
         PRV_TXArr[PRV_TXIdx] = copy_u8PtrString[PRV_TXIdx];
@@ -110,11 +112,25 @@ void UART_voidReceiveStringBLOCKING(u8 *copy_u8PtrRecevieString)
     }
 }
 
-void UART_voidReceiveStringNON_BLOCKING(u8 *copy_u8PtrRecevieString)
+void UART_voidReceiveStringNON_BLOCKING(u8 copy_u8PtrRecevieString[100])
 {
-    for (u8 i = 0; i < PRV_RXIdx; i++)
+    u8 i = 0;
+    for (i = 0; (i < UART_MAX_BUFFER_SIZE) && (PRV_RXArr[i] != UART_DELEMITER); i++)
     {
         copy_u8PtrRecevieString[i] = PRV_RXArr[i];
+    }
+}
+
+void UART_voidStrIsReceived(u8 *copy_u8PtrBool)
+{
+    if (PRV_RXStrComplete)
+    {
+        *copy_u8PtrBool = 1;
+        PRV_RXStrComplete = 0;
+    }
+    else
+    {
+        *copy_u8PtrBool = 0;
     }
 }
 
@@ -133,9 +149,15 @@ ISR(USART_TXC_vect)
 
 ISR(USART_RXC_vect)
 {
-    PRV_RXArr[PRV_RXIdx++] = UDR;
-    if (PRV_RXArr[PRV_RXIdx - 1] == UART_DELEMITER)
+    PRV_RXArr[PRV_RXIdx] = UDR;
+    if (PRV_RXArr[PRV_RXIdx] == UART_DELEMITER)
     {
+        PRV_RXArr[PRV_RXIdx] = '\0';
         PRV_RXIdx = 0;
+        PRV_RXStrComplete = 1;
+    }
+    else
+    {
+        PRV_RXIdx++;
     }
 }
