@@ -14,10 +14,11 @@
 #include "SERVO_interface.h"
 #include "WDT_interface.h"
 #include "ICU_interface.h"
+#include "UART_interface.h"
 
 #include "BitMath.h"
-
 #include "string.h"
+
 /* Keypad Matrix */
 u8 KeypadMatrix[4][4] = {
     {'7', '8', '9', '9'},
@@ -43,31 +44,33 @@ void func(void)
 {
   Tog_Bit(PORTA, PIN5);
 }
-u8 duty = 0;
-u8 freq = 0;
-extern volatile u8 State;
+
 int main(void)
 {
   /* Initialization seciton */
   DIO_voidInitPins();
   // Green led
   LCD_4_bit_voidInit();
-  PWM_voidInitChannel0();
-  PWM_voidGenerateOnChannel0(80, PWM_FREQ_DIV_BY_64);
-  _delay_ms(2);
-  ICU_voidInit();
+  u8 ch = 3;
+  LCD_4_bit_voidWriteChar('3');
+
+  UART_voidInit(UART_9600_BAUD_RATE);
 
   while (1)
   {
-    ICU_voidGetDuty(&duty);
-    ICU_voidGetFreqHz(&freq);
-    LCD_4_bit_voidWriteStringAt((u8 *)"state :", 0, 0);
-    LCD_4_bit_voidWriteInt(TCNT1);
-    LCD_4_bit_voidWriteStringAt((u8 *)"freq :", 1, 0);
-    LCD_4_bit_voidWriteInt(freq);
-    _delay_ms(100);
-    LCD_4_bit_voidSendCommand(_LCD_CLEAR);
-    _delay_ms(2);
+    // UART_voidSendByteBLOCKING('g');
+
+    UART_voidReceiveByteBLOCKING(&ch);
+    if (ch != '\0')
+    {
+      LCD_4_bit_voidWriteChar(ch);
+    }
+    else
+    {
+      LCD_4_bit_voidWriteChar('3');
+    }
+
+    _delay_ms(50);
   }
 
   return 0;
