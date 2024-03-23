@@ -4,11 +4,12 @@
 #include "avr/interrupt.h"
 #include "GLOBAL_INT.h"
 #include "LCD_interface.h"
+#include "util/atomic.h"
 
-static u8 PRV_TXArr[UART_MAX_BUFFER_SIZE];
+static u8 PRV_TXArr[UART_MAX_BUFFER_SIZE + 1];
 static u8 PRV_TXIdx = 0;
 
-static u8 PRV_RXArr[UART_MAX_BUFFER_SIZE];
+static u8 PRV_RXArr[UART_MAX_BUFFER_SIZE + 1];
 static u8 PRV_RXIdx = 0;
 
 static u8 PRV_RXStrComplete = 0;
@@ -112,13 +113,21 @@ void UART_voidReceiveStringBLOCKING(u8 *copy_u8PtrRecevieString)
     }
 }
 
-void UART_voidReceiveStringNON_BLOCKING(u8 copy_u8PtrRecevieString[100])
+void UART_voidReceiveStringNON_BLOCKING(u8 copy_u8PtrRecevieString[])
 {
     u8 i = 0;
-    for (i = 0; (i < UART_MAX_BUFFER_SIZE) && (PRV_RXArr[i] != UART_DELEMITER); i++)
+
+    for (i = 0; ((i < UART_MAX_BUFFER_SIZE) && (PRV_RXArr[i] != UART_DELEMITER)); i++)
     {
         copy_u8PtrRecevieString[i] = PRV_RXArr[i];
     }
+
+    // while ((PRV_RXArr[i] != UART_END_OF_STRING))
+    // {
+    //     copy_u8PtrRecevieString[i] = PRV_RXArr[i];
+    //     PRV_RXArr[i] = '\0';
+    //     i++;
+    // }
 }
 
 void UART_voidStrIsReceived(u8 *copy_u8PtrBool)
@@ -149,15 +158,20 @@ ISR(USART_TXC_vect)
 
 ISR(USART_RXC_vect)
 {
-    PRV_RXArr[PRV_RXIdx] = UDR;
-    if (PRV_RXArr[PRV_RXIdx] == UART_DELEMITER)
+    u8 tempdata = UDR;
+
+    if (tempdata == UART_DELEMITER)
     {
-        PRV_RXArr[PRV_RXIdx] = '\0';
-        PRV_RXIdx = 0;
-        PRV_RXStrComplete = 1;
+        ATOMIC_BLOCK(ATOMIC_FORCEON)
+        {
+            PRV_RXArr[PRV_RXIdx] = UART_END_OF_STRING;
+            PRV_RXStrComplete = 1;
+            PRV_RXIdx = 0;
+        }
     }
     else
     {
+        PRV_RXArr[PRV_RXIdx] = tempdata;
         PRV_RXIdx++;
     }
 }

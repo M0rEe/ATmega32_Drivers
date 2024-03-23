@@ -51,10 +51,11 @@ int main(void)
   DIO_voidInitPins();
   // Green led
   LCD_4_bit_voidInit();
-  u8 ch[100];
   u8 state = 0;
+  u8 line = 0;
   UART_voidInit(UART_9600_BAUD_RATE);
-
+  Set_Bit(DDRA,PIN1);
+  u8 ch[100] = {'\000'};
   while (1)
   {
 
@@ -62,11 +63,13 @@ int main(void)
     if (state == 1)
     {
       UART_voidReceiveStringNON_BLOCKING(ch);
-      LCD_4_bit_voidWriteStringAt(ch, 1, 0);
-    }else{
-      LCD_4_bit_voidWriteChar('-');
+      LCD_4_bit_voidWriteStringAt(ch, (line++) % 4, 0);
+      if (strcmp((char *)ch, "test") == 0)
+      {
+        Tog_Bit(PORTA, PIN1);
+      }
     }
-    _delay_ms(100);
+    _delay_ms(1);
   }
 
   return 0;

@@ -30,5 +30,6 @@
 //---------------
 #define UART_STOP_BITS_MODE  UART_ONE_STOP_MODE
 
-#define UART_DELEMITER '\r'
+#define UART_DELEMITER '*'
+#define UART_END_OF_STRING '\0'
 #endif // __UART_CONFIG_H__
