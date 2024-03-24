@@ -6,8 +6,6 @@
 #include "avr/io.h"
 #include "avr/interrupt.h"
 
-#define I2C_BYTE_RATE 0x0C
-#define I2C_PRESCALER_VALUE 0x00
 
 #define TWI_STATUS_VALUE (TWSR & 0xF8)
 

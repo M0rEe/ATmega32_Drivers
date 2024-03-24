@@ -16,7 +16,7 @@
 #include "ICU_interface.h"
 #include "UART_interface.h"
 #include "I2C_interface.h"
-
+#include "EEPROM_interface.h"
 
 #include "BitMath.h"
 #include "string.h"
@@ -53,25 +53,25 @@ int main(void)
   DIO_voidInitPins();
   // Green led
   LCD_4_bit_voidInit();
-  u8 state = 0;
-  u8 line = 0;
-  UART_voidInit(UART_9600_BAUD_RATE);
-  Set_Bit(DDRA,PIN1);
-  u8 ch[100] = {'\000'};
+
+  
+  EEPROM_voidInit();
+  u8 arr[5] = {'a', 's', 'd', 'g', '\0'};
+  EEPROM_voidWritePage(100, arr, 5);
+  u8 temp[5];
   while (1)
   {
-
-    UART_voidStrIsReceived(&state);
-    if (state == 1)
+    EEPROM_voidReadPage(100, temp, 5);
+    if (strcmp("asdg", temp) == 0)
     {
-      UART_voidReceiveStringNON_BLOCKING(ch);
-      LCD_4_bit_voidWriteStringAt(ch, (line++) % 4, 0);
-      if (strcmp((char *)ch, "test") == 0)
-      {
-        Tog_Bit(PORTA, PIN1);
-      }
+      LCD_4_bit_voidWriteStringAt(temp, 2, 0);
     }
-    _delay_ms(1);
+    else
+    {
+      LCD_4_bit_voidWriteStringAt("FAILED!!", 1, 0);
+      LCD_4_bit_voidWriteStringAt(temp, 3, 0);
+    }
+    _delay_ms(150);
   }
 
   return 0;

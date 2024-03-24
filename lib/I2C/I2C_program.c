@@ -1,6 +1,3 @@
-
-#include "I2C_config.h"
-
 #include "I2C_interface.h"
 
 void I2C_voidInitMaster(void)
@@ -16,6 +13,7 @@ void I2C_voidInitMaster(void)
 
 void I2C_voidSendStartCondition(void)
 {
+
     // Request Start Condition
     Set_Bit(TWCR, TWSTA);
 
@@ -117,6 +115,7 @@ void I2C_voidSendSlaveAddWithRead(u8 copy_u8SlaveAdd)
 
 void I2C_voidTransmitMasterDataByte(u8 copy_u8TxData)
 {
+
     // Write Data into data register
     TWDR = copy_u8TxData;
 
