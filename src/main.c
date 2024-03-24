@@ -15,6 +15,8 @@
 #include "WDT_interface.h"
 #include "ICU_interface.h"
 #include "UART_interface.h"
+#include "I2C_interface.h"
+
 
 #include "BitMath.h"
 #include "string.h"
